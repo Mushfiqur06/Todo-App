@@ -1,14 +1,21 @@
 import React, { Component } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-
+import Note from './NoteComponent'
 export default class MainComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
+        noteArray: [],
+        noteText: ''
     };
   }
 
   render() {
+
+    let notes = this.state.noteArray.map((val, key) => {
+        return <Note key={key} keyval={key} val={val} deleteMethod={ () => this.deleteNote(key) } />
+    })
+
     return (
       <View style={styles.container}>
         
@@ -17,12 +24,14 @@ export default class MainComponent extends Component {
         </View>
 
         <ScrollView style={styles.scrollContainer}>
-
+            {notes}
         </ScrollView>
 
         <View style={styles.footer}>
             <TextInput 
                 style={styles.textInput}
+                onChangeText={(noteText) => this.setState({noteText})}
+                value={this.state.noteText}
                 placeholder="Create Note"
                 placeholderTextColor="white"
                 underlineColorAndroid="transparent"
@@ -31,13 +40,38 @@ export default class MainComponent extends Component {
             </TextInput>
         </View>
 
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity onPress={this.addNote.bind(this)} style={styles.addButton}>
             <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
 
       </View>
     );
   }
+
+    addNote(){
+        if(this.state.noteText){
+            let d = new Date();
+            this.state.noteArray.push({
+                'date': d.getFullYear() + 
+                '/' + (d.getMonth() + 1) + 
+                '/' + (d.getDate()),
+                'note': this.state.noteText
+            })
+
+            this.setState({
+                noteArray: this.state.noteArray,
+                noteText: ''
+            })
+        }
+    }
+
+    deleteNote(key){
+        this.state.noteArray.splice(key, 1);
+        this.setState({
+            noteArray: this.state.noteArray
+        })
+    }
+
 }
 
 const styles = StyleSheet.create({
